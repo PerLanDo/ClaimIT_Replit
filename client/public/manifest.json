@@ -1,0 +1,21 @@
+{
+  "name": "ClaimIT - MSU-IIT Lost & Found",
+  "short_name": "ClaimIT",
+  "description": "Campus Lost and Found Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F5F5F5",
+  "theme_color": "#800000",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
