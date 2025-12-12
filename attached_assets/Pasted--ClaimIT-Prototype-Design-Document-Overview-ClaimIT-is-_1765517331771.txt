@@ -1,0 +1,891 @@
+# ClaimIT Prototype - Design Document
+
+## Overview
+
+ClaimIT is a Progressive Web Application (PWA) for campus lost and found management at MSU-IIT. The prototype demonstrates core functionality including item reporting, searching, claims management, messaging, and administrative features. Built with React.js frontend and Firebase backend, the system supports dual-mode item recovery (peer-to-peer and centralized SID management).
+
+### Key Design Goals
+
+- **Accessibility**: 24/7 availability via web browser on any device
+- **Security**: Role-based access control with SSO authentication
+- **Scalability**: Firebase backend with path to SQL migration
+- **Usability**: Mobile-first responsive design
+- **Transparency**: Complete audit trail and real-time notifications
+
+## UI/UX Design System
+
+### MSU-IIT Brand Colors
+
+The color palette is based on the official MSU-IIT (Mindanao State University - Iligan Institute of Technology) branding:
+
+#### 🎨 Light Mode (Default)
+
+**Primary Colors:**
+
+- **Primary (Maroon)**: `#800000` - MSU-IIT brand color, used for primary actions and headings
+- **Secondary (Gold)**: `#FFD700` - MSU-IIT accent color, used for highlights and secondary elements
+- **Accent**: `#FFFFFF` (White) - Used for text on dark backgrounds
+
+**Text Colors:**
+
+- **Main Text**: `#333333` - Dark gray for primary body text
+- **Light Text**: `#555555` - Medium gray for secondary text
+- **Background**: `#F5F5F5` to `#FAFAFA` (gradient) - Off-white background
+
+**Interactive States:**
+
+- **Hover**: `#A00000` - Darker maroon for hover states
+- **Border**: `#E0E0E0` - Light gray for borders and dividers
+
+**Gradient Definitions:**
+
+- **Primary Gradient**: `linear-gradient(135deg, #800000 0%, #A00000 50%, #600000 100%)`
+- **Gold Gradient**: `linear-gradient(135deg, #FFD700 0%, #FFDF40 50%, #D4A745 100%)`
+- **Accent Gradient**: `linear-gradient(135deg, #667EEA 0%, #764BA2 50%, #5A3D7A 100%)`
+
+**UI Elements:**
+
+- **Card Background**: `#FFFFFF`
+- **Content Background**: `#FFFFFF`
+- **Placeholder Background**: `linear-gradient(135deg, #F0F0F0 0%, #E0E0E0 100%)`
+- **Placeholder Border**: `#D0D0D0`
+
+#### 🌙 Dark Mode
+
+**Primary Colors:**
+
+- **Primary (Bright Maroon)**: `#C92A2A` - Enhanced maroon for better visibility in dark mode
+- **Secondary (Gold)**: `#FFD43B` - Brighter gold for contrast
+- **Accent**: `#FFFFFF` (White) - Maintains white for primary text
+
+**Text Colors:**
+
+- **Main Text**: `#F1F3F5` - Light gray for primary body text
+- **Light Text**: `#CED4DA` - Slightly dimmer for secondary text
+- **Background**: `#1A1B1E` to `#25262B` (gradient) - Dark background
+
+**Interactive States:**
+
+- **Hover**: `#E03131` - Bright red for hover states
+- **Border**: `#373A40` - Dark gray for borders and dividers
+
+**Gradient Definitions:**
+
+- **Primary Gradient**: `linear-gradient(135deg, #C92A2A 0%, #A61E1E 50%, #800000 100%)`
+- **Gold Gradient**: `linear-gradient(135deg, #FFD43B 0%, #FFC107 50%, #FF9800 100%)`
+- **Accent Gradient**: `linear-gradient(135deg, #667EEA 0%, #764BA2 50%, #F093FB 100%)`
+
+**UI Elements:**
+
+- **Card Background**: `#25262B` - Dark slate for cards
+- **Content Background**: `#2C2E33` - Slightly lighter for content areas
+- **Placeholder Background**: `linear-gradient(135deg, #2C2E33 0%, #25262B 100%)`
+- **Placeholder Border**: `#373A40`
+- **Body Gradient Start**: `#1A1B1E`
+- **Body Gradient End**: `#25262B`
+
+### Shadow System
+
+#### Light Mode Shadows
+
+- **Small**: `0 2px 8px rgba(128, 0, 0, 0.08)`
+- **Medium**: `0 4px 20px rgba(128, 0, 0, 0.12), 0 2px 8px rgba(128, 0, 0, 0.08)`
+- **Large**: `0 10px 40px rgba(128, 0, 0, 0.15), 0 4px 16px rgba(128, 0, 0, 0.1)`
+- **Extra Large**: `0 20px 60px rgba(128, 0, 0, 0.2), 0 8px 24px rgba(128, 0, 0, 0.15)`
+
+#### Dark Mode Shadows
+
+- **Small**: `0 2px 8px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(201, 42, 42, 0.1)`
+- **Medium**: `0 4px 20px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(201, 42, 42, 0.15)`
+- **Large**: `0 10px 40px rgba(0, 0, 0, 0.8), 0 4px 16px rgba(201, 42, 42, 0.2)`
+- **Extra Large**: `0 20px 60px rgba(0, 0, 0, 0.9), 0 8px 24px rgba(201, 42, 42, 0.25)`
+
+### Theme Switching
+
+The application SHALL:
+
+1. Detect the user's system preference for Light or Dark mode on initial load
+2. Apply the appropriate theme automatically
+3. Allow users to manually override the theme preference
+4. Persist the user's theme choice in localStorage
+5. Apply smooth transitions between themes (200ms ease-in-out)
+
+## Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend (React PWA)"
+        UI[React Components]
+        Router[React Router]
+        State[Context/State Management]
+        PWA[Service Worker]
+    end
+
+    subgraph "Firebase Services"
+        Auth[Firebase Auth]
+        Firestore[(Firestore DB)]
+        Storage[Cloud Storage]
+        FCM[Cloud Messaging]
+        Functions[Cloud Functions]
+    end
+
+    subgraph "External"
+        SSO[University SSO/SAML]
+        Email[Email Service]
+    end
+
+    UI --> Router
+    UI --> State
+    State --> Auth
+    State --> Firestore
+    State --> Storage
+    Auth --> SSO
+    Functions --> FCM
+    Functions --> Email
+    PWA --> FCM
+```
+
+### Technology Stack
+
+| Layer | Technology | Purpose |
+| --- | --- | --- |
+| Frontend | React.js 18+ | UI components and routing |
+| Styling | Tailwind CSS | Responsive design system |
+| State | React Context + Hooks | Client-side state management |
+| Auth | Firebase Auth | Authentication with SSO |
+| Database | Firestore | Real-time NoSQL database |
+| Storage | Firebase Storage | Image uploads |
+| Notifications | Firebase Cloud Messaging | Push notifications |
+| Functions | Firebase Cloud Functions | Server-side logic |
+| QR Codes | qrcode.react | QR code generation |
+| Testing | Vitest + fast-check | Unit and property-based testing |
+
+## Components and Interfaces
+
+### Component Hierarchy
+
+```
+App
+├── AuthProvider
+│   ├── PublicRoutes
+│   │   ├── LandingPage
+│   │   └── LoginPage
+│   │       ├── MSU-IIT Logo
+│   │       ├── ClaimIT Branding
+│   │       ├── Sign in with My.IIT Button
+│   │       └── Footer ("Managed by SID & ICTC")
+│   └── ProtectedRoutes
+│       ├── Layout (Header, Navigation, Footer)
+│       │   ├── Header
+│       │   │   ├── Profile Avatar
+│       │   │   ├── Notification Bell (with badge)
+│       │   │   └── Search Bar
+│       │   └── Bottom Navigation (Mobile)
+│       ├── Dashboard
+│       │   ├── Tab Navigation (LOST / FOUND / ALL)
+│       │   ├── ItemFeed
+│       │   │   └── ItemCard
+│       │   │       ├── Item Thumbnail
+│       │   │       ├── Status Badge (LOST/FOUND)
+│       │   │       ├── Title
+│       │   │       ├── Location
+│       │   │       └── Date
+│       │   ├── FloatingActionButton (+)
+│       │   └── QuickStats
+│       ├── ItemDetail
+│       │   ├── Back Button
+│       │   ├── PhotoGallery
+│       │   ├── ItemInfo
+│       │   │   ├── Title
+│       │   │   ├── Reporter Profile
+│       │   │   ├── Date & Location
+│       │   │   └── Description
+│       │   ├── Show Item QR (expandable)
+│       │   ├── Action Buttons
+│       │   │   ├── Claim This Item (Gold button)
+│       │   │   └── Message Finder (secondary)
+│       │   └── QRCodeDisplay
+│       ├── ReportItem
+│       │   ├── Report Type Toggle
+│       │   │   ├── "I LOST something" (Red theme)
+│       │   │   └── "I FOUND something" (Gold theme)
+│       │   ├── ItemForm
+│       │   │   ├── Title
+│       │   │   ├── Category Dropdown
+│       │   │   ├── Location
+│       │   │   └── Description
+│       │   ├── PhotoUpload
+│       │   │   ├── Upload Zone
+│       │   │   ├── Wallet Warning (conditional)
+│       │   │   └── Preview Thumbnails
+│       │   ├── Found Item Options
+│       │   │   ├── Turn over to SID (icon + text)
+│       │   │   └── Keep for Peer-to-Peer (icon + text)
+│       │   └── Submit Button
+│       ├── Claims
+│       │   ├── ClaimForm
+│       │   │   ├── Proof of Ownership (textarea)
+│       │   │   ├── Secondary File Upload
+│       │   │   └── Submit Claim Button
+│       │   ├── ClaimList
+│       │   └── ClaimReview
+│       │       ├── Verify Ownership Modal
+│       │       ├── Proof Display
+│       │       ├── Primary File Upload
+│       │       ├── Secondary File Upload
+│       │       └── Submit Claim Button
+│       ├── Messages
+│       │   ├── ConversationList
+│       │   └── ChatWindow
+│       ├── Notifications
+│       │   └── NotificationList
+│       ├── Profile
+│       │   ├── UserInfo
+│       │   └── Statistics
+│       └── AdminDashboard (SID only) - Tablet Optimized
+│           ├── Stats Grid
+│           │   ├── Total Items Card (with trend graph)
+│           │   ├── Pending Claims Card
+│           │   ├── Returned Card
+│           │   └── Recovery Rate Card (with trend graph)
+│           ├── Recent Activity Table
+│           │   ├── Date Column
+│           │   ├── Item Column
+│           │   ├── Location Column
+│           │   └── Status Column (with badges)
+│           ├── TurnoverManager
+│           ├── ClaimVerification
+│           ├── Analytics
+│           │   ├── Recovery Rate Graph
+│           │   └── Item Category Breakdown
+│           └── ItemManagement
+```
+
+## Screen-Specific Design Specifications
+
+### 1. Login Screen
+
+**Layout:**
+
+- Centered vertical layout
+- MSU-IIT logo at top (seal with maroon border)
+- "ClaimIT" branding in maroon
+- Primary CTA: "Sign in with My.IIT" button (gold gradient)
+- Footer: "Managed by SID & ICTC" in small text
+
+**Theme Variants:**
+
+- Light Mode: White background, dark maroon text
+- Dark Mode: Dark gradient background, bright maroon text on dark card
+
+**Spacing:**
+
+- Logo: 100px height
+- Vertical spacing: 24px between elements
+- Button: Full width with 16px horizontal padding
+
+### 2. Home Feed (Dashboard)
+
+**Layout:**
+
+- Top Navigation: Search bar, Profile avatar, Notification bell
+- Tab Bar: "LOST" | "FOUND" | "ALL" (gold active indicator)
+- Item Grid: 2-column grid (mobile), 3-4 columns (tablet/desktop)
+- Floating Action Button: Bottom-right corner, maroon with + icon
+
+**Item Card Design:**
+
+- Rounded corners (12px)
+- Shadow: Medium elevation
+- Status badge: Top-left corner (LOST: red, FOUND: gold)
+- Thumbnail: 16:9 aspect ratio
+- Text overlay gradient at bottom
+- Content: Title, Location (pin icon), Date (clock icon)
+
+**Theme Variants:**
+
+- Light Mode: White cards, #F5F5F5 background
+- Dark Mode: #25262B cards, #1A1B1E background
+
+### 3. Report Item Screen
+
+**Layout:**
+
+- Full-screen modal or page
+- Toggle at top: "I LOST something" / "I FOUND something"
+- Form fields with labels and validation
+- Photo upload zone with drag-and-drop
+- Action buttons at bottom
+
+**Report Type Toggle:**
+
+- Segmented control style
+- LOST: Red background when active
+- FOUND: Gold background when active
+- Smooth transition (200ms)
+
+**Photo Upload Zone:**
+
+- Dashed border placeholder
+- Camera icon
+- "Photo Upload Zone" text
+- Warning banner for Wallets: Yellow background, alert icon
+  - Text: "For Wallets: Upload photo of EXTERIOR only. Do not photograph contents."
+
+**Found Item Options:**
+
+- Two large buttons with icons
+- "Turn over to SID": Building icon, subtitle explains secure storage
+- "Keep for Peer-to-Peer": Handshake icon, subtitle explains direct coordination
+
+### 4. Item Details Screen
+
+**Layout:**
+
+- Back button: Top-left
+- Hero image: Full-width, 16:9 aspect ratio
+- Content section: White/dark card with padding
+- QR section: Expandable "Show Item QR" button
+- Action buttons: Fixed at bottom
+
+**Content Sections:**
+
+- Title: Large, bold
+- Reporter Profile: Avatar, name, role
+- Metadata: Date, Location with icons
+- Description: Body text
+
+**QR Code Display:**
+
+- Expandable accordion
+- QR code: Centered, 200x200px
+- Buttons below QR:
+  - "Claim This Item" (Gold, primary)
+  - "Message Finder" (secondary outline)
+
+**Theme Variants:**
+
+- Light Mode: White content card
+- Dark Mode: #2C2E33 content card
+
+### 5. Claim & Proof Screen
+
+**Layout:**
+
+- Modal overlay with backdrop blur
+- Title: "Verify Ownership"
+- Subtitle: "Tell us how you know this is your item"
+- Form with textarea and file uploads
+- Submit button at bottom
+
+**Form Elements:**
+
+- Proof textarea: Min 50 chars, character counter
+- Primary file upload: "Enter your own distinctive reasons"
+- Secondary file upload: "Enter your own distinctive reasons again" (with paperclip icon)
+- Validation: Real-time with error messages
+
+**Button States:**
+
+- Enabled: Maroon gradient, white text
+- Disabled: Gray, reduced opacity
+- Loading: Spinner inside button
+
+### 6. Admin Dashboard (Tablet)
+
+**Layout:**
+
+- Sidebar navigation: Left side, maroon background, icons + labels
+- Main content: Grid layout
+- Header: "Stats" title, notification bell, profile
+
+**Stats Cards (2x2 Grid):**
+
+1. **Total Items**: Large number, sparkline trend graph
+2. **Pending Claims**: Large number, static count
+3. **Returned**: Large number, bar chart showing daily returns
+4. **Recovery Rate**: Percentage, line graph showing trend
+
+**Card Design:**
+
+- Light Mode: White background, shadow
+- Dark Mode: #25262B background, darker shadow
+- Header: Small label, large number
+- Footer: Trend graph or chart
+
+**Recent Activity Table:**
+
+- Columns: Date, Item, Location, Status
+- Alternating row colors
+- Status badges: Color-coded (FOUND: gold, LOST: red, RETURNED: green)
+- Action icons: Check, X (for approve/reject)
+
+**Theme Variants:**
+
+- Light Mode: White table, #F5F5F5 alternate rows
+- Dark Mode: #2C2E33 table, #25262B alternate rows
+
+### Typography Scale
+
+| Element | Size | Weight | Line Height |
+| --- | --- | --- | --- |
+| H1 (Page Title) | 32px | 700 | 1.2 |
+| H2 (Section) | 24px | 600 | 1.3 |
+| H3 (Card Title) | 18px | 600 | 1.4 |
+| Body | 16px | 400 | 1.5 |
+| Small | 14px | 400 | 1.4 |
+| Caption | 12px | 400 | 1.3 |
+| Button | 16px | 600 | 1   |
+
+### Spacing System
+
+- **XS**: 4px - Tight spacing within components
+- **SM**: 8px - Compact element spacing
+- **MD**: 16px - Default spacing between elements
+- **LG**: 24px - Section spacing
+- **XL**: 32px - Major section dividers
+- **2XL**: 48px - Page-level spacing
+
+### Border Radius
+
+- **Small**: 4px - Buttons, badges
+- **Medium**: 8px - Input fields, small cards
+- **Large**: 12px - Cards, modals
+- **Extra Large**: 16px - Hero images, major containers
+- **Full**: 9999px - Circular elements, pills
+
+### Icon System
+
+**Icon Library**: Use Material Icons or Heroicons
+
+**Common Icons:**
+
+- Search: Magnifying glass
+- Notifications: Bell
+- Profile: User circle
+- Add: Plus in circle
+- Location: Map pin
+- Date: Calendar/clock
+- Camera: Camera outline
+- QR Code: QR code grid
+- Message: Chat bubble
+- Back: Chevron left
+- Status (LOST): Alert circle (red)
+- Status (FOUND): Star (gold)
+- Status (RETURNED): Check circle (green)
+
+**Icon Sizes:**
+
+- Small: 16px
+- Medium: 24px (default)
+- Large: 32px
+- Extra Large: 48px
+
+### Key Interfaces
+
+```typescript
+// User types
+interface User {
+  userId: string;
+  email: string;
+  fullName: string;
+  role: "Student" | "Faculty" | "Staff" | "SID_Admin";
+  department?: string;
+  reputationScore: number;
+  createdAt: Date;
+}
+
+// Item types
+interface Item {
+  itemId: string;
+  reporterId: string;
+  type: "Lost" | "Found";
+  category: ItemCategory;
+  status: ItemStatus;
+  title: string;
+  description: string;
+  location: string;
+  imageUrls: string[];
+  isHighValue: boolean;
+  dateReported: Date;
+  dateLostFound: Date;
+  qrCode?: string;
+}
+
+type ItemCategory =
+  | "Electronics"
+  | "Clothing"
+  | "IDs_Cards"
+  | "Wallets"
+  | "Books"
+  | "Bags"
+  | "Tumblers"
+  | "Umbrellas"
+  | "Keys"
+  | "Other";
+
+type ItemStatus =
+  | "Open"
+  | "Pending_Claim"
+  | "Returned"
+  | "Surrendered_SID"
+  | "Archived"
+  | "Disposed";
+
+// Claim types
+interface Claim {
+  claimId: string;
+  itemId: string;
+  claimantId: string;
+  status: ClaimStatus;
+  proofDescription: string;
+  proofImageUrl?: string;
+  dateFiled: Date;
+  reviewedBy?: string;
+  reviewNotes?: string;
+  handoverQrCode?: string;
+}
+
+type ClaimStatus = "Pending" | "Approved" | "Rejected" | "Completed";
+
+// Message types
+interface Message {
+  messageId: string;
+  itemId: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: Date;
+  isRead: boolean;
+}
+
+// Notification types
+interface Notification {
+  notificationId: string;
+  userId: string;
+  type: NotificationType;
+  content: string;
+  relatedItemId?: string;
+  isRead: boolean;
+  timestamp: Date;
+}
+
+type NotificationType =
+  | "Claim_Update"
+  | "New_Message"
+  | "Item_Match"
+  | "Turnover_Reminder"
+  | "System";
+
+// Turnover log types
+interface TurnoverLog {
+  logId: string;
+  itemId: string;
+  officerId: string;
+  dateReceived: Date;
+  dateReleased?: Date;
+  remarks?: string;
+}
+```
+
+## Data Models
+
+### Firestore Collections Structure
+
+```
+/users/{userId}
+  - email: string
+  - fullName: string
+  - role: string
+  - department: string
+  - reputationScore: number
+  - createdAt: timestamp
+
+/items/{itemId}
+  - reporterId: string
+  - type: string
+  - category: string
+  - status: string
+  - title: string
+  - description: string
+  - location: string
+  - imageUrls: array<string>
+  - isHighValue: boolean
+  - dateReported: timestamp
+  - dateLostFound: timestamp
+  - qrCode: string
+
+/claims/{claimId}
+  - itemId: string
+  - claimantId: string
+  - status: string
+  - proofDescription: string
+  - proofImageUrl: string
+  - dateFiled: timestamp
+  - reviewedBy: string
+  - reviewNotes: string
+  - handoverQrCode: string
+
+/messages/{messageId}
+  - itemId: string
+  - senderId: string
+  - receiverId: string
+  - content: string
+  - timestamp: timestamp
+  - isRead: boolean
+
+/notifications/{notificationId}
+  - userId: string
+  - type: string
+  - content: string
+  - relatedItemId: string
+  - isRead: boolean
+  - timestamp: timestamp
+
+/turnoverLogs/{logId}
+  - itemId: string
+  - officerId: string
+  - dateReceived: timestamp
+  - dateReleased: timestamp
+  - remarks: string
+```
+
+### Entity Relationships
+
+```mermaid
+erDiagram
+    USER ||--o{ ITEM : reports
+    USER ||--o{ CLAIM : submits
+    USER ||--o{ MESSAGE : sends
+    USER ||--o{ MESSAGE : receives
+    USER ||--o{ NOTIFICATION : receives
+    USER ||--o{ TURNOVER_LOG : processes
+
+    ITEM ||--o{ CLAIM : has
+    ITEM ||--o{ MESSAGE : subject_of
+    ITEM ||--o| TURNOVER_LOG : recorded_in
+
+    USER {
+        string userId PK
+        string email
+        string fullName
+        string role
+        number reputationScore
+    }
+
+    ITEM {
+        string itemId PK
+        string reporterId FK
+        string type
+        string category
+        string status
+        string title
+        string description
+    }
+
+    CLAIM {
+        string claimId PK
+        string itemId FK
+        string claimantId FK
+        string status
+        string proofDescription
+    }
+
+    MESSAGE {
+        string messageId PK
+        string itemId FK
+        string senderId FK
+        string receiverId FK
+        string content
+    }
+```
+
+## Correctness Properties
+
+_A property is a characteristic or behavior that should hold true across all valid executions of a system-essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees._
+
+### Property 1: Role Assignment Consistency
+
+_For any_ user authentication, the assigned role SHALL match the user's account type from the authentication provider.
+**Validates: Requirements 1.2**
+
+### Property 2: Item Creation Integrity
+
+_For any_ valid item report submission, the created item record SHALL contain all required fields (title, category, description, location, date) and have the correct status ("Lost" or "Found").
+**Validates: Requirements 2.1, 2.2**
+
+### Property 3: Photo Upload Validation
+
+_For any_ photo upload attempt, ClaimIT SHALL accept only files that are JPEG or PNG format AND under 5MB in size AND the total count does not exceed 5.
+**Validates: Requirements 2.3**
+
+### Property 4: QR Code Uniqueness
+
+_For any_ successfully submitted item, the generated QR code SHALL be unique across all items in the system.
+**Validates: Requirements 2.5**
+
+### Property 5: Form Validation Completeness
+
+_For any_ item report with empty required fields, the submission SHALL be rejected with appropriate validation errors.
+**Validates: Requirements 2.6**
+
+### Property 6: Search Result Accuracy
+
+_For any_ search query, all returned items SHALL contain the search keywords in either the title or description field.
+**Validates: Requirements 3.2**
+
+### Property 7: Filter Result Correctness
+
+_For any_ applied filter combination, all returned items SHALL match ALL specified filter criteria (category, status, date range, location).
+**Validates: Requirements 3.3**
+
+### Property 8: Claim Proof Minimum Length
+
+_For any_ claim submission, the proof of ownership description SHALL have at least 50 characters.
+**Validates: Requirements 4.1**
+
+### Property 9: Claim Status Transition
+
+_For any_ valid claim submission, the associated item status SHALL change to "Pending_Claim".
+**Validates: Requirements 4.2**
+
+### Property 10: Self-Claim Prevention
+
+_For any_ claim attempt where the claimant is the item reporter, the claim SHALL be rejected.
+**Validates: Requirements 4.6**
+
+### Property 11: Message Chronological Order
+
+_For any_ conversation view, messages SHALL be displayed in chronological order by timestamp.
+**Validates: Requirements 5.4**
+
+### Property 12: Handover QR Validation
+
+_For any_ QR code scan during handover, the system SHALL correctly validate whether the code matches the approved claim.
+**Validates: Requirements 7.2**
+
+### Property 13: Handover Completion State
+
+_For any_ valid QR code scan, the item status SHALL change to "Returned" and both users' transaction histories SHALL be updated.
+**Validates: Requirements 7.3**
+
+### Property 14: Reputation Score Increment
+
+_For any_ successful item return, the finder's reputation score SHALL increase by the defined increment value.
+**Validates: Requirements 8.3**
+
+### Property 15: Item Serialization Round-Trip
+
+_For any_ valid Item object, serializing to JSON and deserializing back SHALL produce an equivalent Item object.
+**Validates: Requirements 10.1, 10.2**
+
+### Property 16: User Serialization Round-Trip
+
+_For any_ valid User object, serializing to JSON and deserializing back SHALL produce an equivalent User object.
+**Validates: Requirements 10.3, 10.4**
+
+### Property 17: Claim Serialization Round-Trip
+
+_For any_ valid Claim object, serializing to JSON and deserializing back SHALL produce an equivalent Claim object.
+**Validates: Requirements 10.5, 10.6**
+
+## Error Handling
+
+### Client-Side Errors
+
+| Error Type | Handling Strategy |
+| --- | --- |
+| Network failure | Auto-save to localStorage, retry with exponential backoff |
+| Validation errors | Inline field highlighting with specific error messages |
+| Auth expiration | Redirect to login with return URL preservation |
+| File upload failure | Display error, allow retry, suggest file size reduction |
+
+### Server-Side Errors
+
+| Error Type | Handling Strategy |
+| --- | --- |
+| Database write failure | Return error to client, log for admin review |
+| Storage quota exceeded | Notify admin, reject upload with user message |
+| Rate limiting | Return 429 with retry-after header |
+| Invalid data | Return 400 with validation details |
+
+### Error Response Format
+
+```typescript
+interface ErrorResponse {
+  code: string;
+  message: string;
+  details?: Record<string, string>;
+  timestamp: Date;
+}
+```
+
+## Testing Strategy
+
+### Dual Testing Approach
+
+The ClaimIT prototype employs both unit testing and property-based testing to ensure comprehensive coverage:
+
+1. **Unit Tests** - Verify specific examples, edge cases, and integration points
+2. **Property-Based Tests** - Verify universal properties that should hold across all inputs
+
+### Testing Framework
+
+- **Test Runner**: Vitest
+- **Property-Based Testing**: fast-check
+- **Component Testing**: React Testing Library
+- **Minimum Iterations**: 100 runs per property test
+
+### Unit Testing Focus Areas
+
+- Component rendering and user interactions
+- Form validation logic
+- Authentication flow
+- API service functions
+- Utility functions (date formatting, QR generation)
+
+### Property-Based Testing Focus Areas
+
+Each property-based test MUST be tagged with the format:
+`**Feature: claimit-prototype, Property {number}: {property_text}**`
+
+Properties to implement:
+
+1. Role assignment consistency
+2. Item creation integrity
+3. Photo upload validation
+4. QR code uniqueness
+5. Form validation completeness
+6. Search result accuracy
+7. Filter result correctness
+8. Claim proof minimum length
+9. Claim status transition
+10. Self-claim prevention
+11. Message chronological order
+12. Handover QR validation
+13. Handover completion state
+14. Reputation score increment
+15. Item serialization round-trip
+16. User serialization round-trip
+17. Claim serialization round-trip
+
+### Test File Organization
+
+```
+src/
+├── components/
+│   └── __tests__/
+│       └── *.test.tsx
+├── services/
+│   └── __tests__/
+│       └── *.test.ts
+├── utils/
+│   └── __tests__/
+│       └── *.test.ts
+└── properties/
+    └── __tests__/
+        ├── item.property.test.ts
+        ├── claim.property.test.ts
+        ├── user.property.test.ts
+        └── serialization.property.test.ts
+```

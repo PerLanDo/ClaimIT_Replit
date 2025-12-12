@@ -1,0 +1,418 @@
+# Implementation Plan
+
+- [x] 
+  
+  1. Project Setup and Configuration
+  
+  - [x] 1.1 Initialize React project with Vite and TypeScript
+    - Create new Vite project with React and TypeScript template
+    - Configure path aliases in tsconfig.json
+    - Set up project directory structure (components, services, utils, types, properties)
+    - _Requirements: Technical foundation_
+  - [x] 1.2 Configure Tailwind CSS and base styling
+    - Install and configure Tailwind CSS
+    - Set up base theme colors: Maroon (#800000), Gold (#FFD700), White (#FFFFFF)
+    - Configure Dark Mode colors: Bright Maroon (#C92A2A), Brighter Gold (#FFD43B)
+    - Define custom gradients (Primary, Gold, Accent) and shadows
+    - Create global styles and utility classes
+    - _Requirements: Technical foundation, 11.1, 11.2, 11.3, 11.4, 11.5_
+  - [x] 1.3 Set up Firebase configuration
+    - Install Firebase SDK packages
+    - Create Firebase configuration file with environment variables
+    - Initialize Firebase app with Auth, Firestore, Storage, and Messaging
+    - _Requirements: Technical foundation_
+  - [x] 1.4 Configure testing framework
+    - Install Vitest, React Testing Library, and fast-check
+    - Configure vitest.config.ts with React support
+    - Set up test utilities and mock providers
+    - _Requirements: Technical foundation_
+- [x] 
+  
+  2. Core Data Models and Types
+  
+  - [x] 2.1 Define TypeScript interfaces and types
+    - Create User, Item, Claim, Message, Notification, TurnoverLog interfaces
+    - Define enums for ItemCategory, ItemStatus, ClaimStatus, NotificationType
+    - Create validation schemas using Zod
+    - _Requirements: 10.1, 10.3, 10.5_
+  - [x] 2.2 Implement serialization utilities
+    - Create toFirestore and fromFirestore converters for each entity
+    - Handle Date/Timestamp conversions
+    - Implement validation during deserialization
+    - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
+  
+  - [x]\* 2.3 Write property test for Item serialization round-trip
+    - **Property 15: Item Serialization Round-Trip**
+    - **Validates: Requirements 10.1, 10.2**
+  - [x]\* 2.4 Write property test for User serialization round-trip
+    - **Property 16: User Serialization Round-Trip**
+    - **Validates: Requirements 10.3, 10.4**
+  - [x]\* 2.5 Write property test for Claim serialization round-trip
+    - **Property 17: Claim Serialization Round-Trip**
+    - **Validates: Requirements 10.5, 10.6**
+- [x] 
+  
+  3. Authentication System
+  
+  - [x] 3.1 Implement AuthContext and AuthProvider
+    - Create authentication context with user state
+    - Implement login, logout, and session persistence
+    - Handle auth state changes with Firebase onAuthStateChanged
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [x] 3.2 Implement role assignment logic
+    - Create function to determine role from auth provider claims
+    - Map university account types to application roles
+    - Store role in user profile on first login
+    - _Requirements: 1.2_
+  
+  - [x]\* 3.3 Write property test for role assignment
+    - **Property 1: Role Assignment Consistency**
+    - **Validates: Requirements 1.2**
+  
+  - [x] 3.4 Create protected route wrapper
+    - Implement ProtectedRoute component
+    - Redirect unauthenticated users to login
+    - Handle role-based route access
+    - _Requirements: 1.4_
+  - [x] 3.5 Build Login and Landing pages
+    - Create LandingPage with app overview and login button
+    - Create LoginPage with "Sign in with My.IIT" button
+    - Add "Managed by SID & ICTC" footer
+    - Implement logout functionality
+    - _Requirements: 1.1, 1.3_
+- [x] 
+  
+  4. Checkpoint - Ensure all tests pass
+    
+  
+  - Ensure all tests pass, ask the user if questions arise.
+- [x] 
+  
+  5. Item Reporting Feature
+  
+  - [x] 5.1 Create ItemForm component
+    - Implement "I LOST something" / "I FOUND something" toggle with theme switching
+    - Build form with fields: title, category, description, location, date
+    - Add warning for Wallet category: "Upload photo of EXTERIOR only"
+    - Implement form validation with error messages
+    - Add dual-mode selection for found items (P2P vs SID turnover)
+    - _Requirements: 2.1, 2.2, 2.6_
+  
+  - [x]\* 5.2 Write property test for form validation
+    - **Property 5: Form Validation Completeness**
+    - **Validates: Requirements 2.6**
+  
+  - [x] 5.3 Implement PhotoUpload component
+    - Create drag-and-drop and click-to-upload interface
+    - Validate file type (JPEG/PNG) and size (max 5MB)
+    - Limit to maximum 5 photos
+    - Display preview thumbnails with remove option
+    - _Requirements: 2.3_
+  
+  - [x]\* 5.4 Write property test for photo upload validation
+    - **Property 3: Photo Upload Validation**
+    - **Validates: Requirements 2.3**
+  
+  - [x] 5.5 Implement item submission service
+    - Create Firestore service for item CRUD operations
+    - Upload images to Firebase Storage
+    - Generate unique item ID and QR code on submission
+    - _Requirements: 2.1, 2.5_
+  
+  - [x]\* 5.6 Write property test for QR code uniqueness
+    - **Property 4: QR Code Uniqueness**
+    - **Validates: Requirements 2.5**
+  - [~]\* 5.7 Write property test for item creation integrity (skipped - schema complexity)
+    - **Property 2: Item Creation Integrity**
+    - **Validates: Requirements 2.1, 2.2**
+  
+  - [x] 5.8 Create ReportItem page
+    - Integrate ItemForm and PhotoUpload components
+    - Show high-value item instructions when applicable
+    - Display success confirmation with item ID and QR code
+    - _Requirements: 2.1, 2.2, 2.4, 2.5_
+- [x] 
+  
+  6. Checkpoint - Ensure all tests pass
+    
+  
+  - Ensure all tests pass, ask the user if questions arise.
+- [x] 
+  
+  7. Dashboard and Item Browsing
+  
+  - [x] 7.1 Create ItemCard component
+    - Display item thumbnail, title, category badge, date, location
+    - Show status indicator
+    - Link to item detail page
+    - _Requirements: 3.1_
+  - [x] 7.2 Build ItemFeed component
+    - Fetch and display items from Firestore with real-time updates
+    - Implement tabs for Lost/Found/All filtering
+    - Add pagination or infinite scroll
+    - _Requirements: 3.1_
+  - [x] 7.3 Implement search functionality
+    - Create SearchBar component with keyword input
+    - Implement search service querying title and description
+    - Display search results in ItemFeed format
+    - _Requirements: 3.2_
+  
+  - [x]\* 7.4 Write property test for search accuracy
+    - **Property 6: Search Result Accuracy**
+    - **Validates: Requirements 3.2**
+  
+  - [x] 7.5 Implement filter functionality
+    - Create FilterPanel with category, status, date range, location filters
+    - Build filter query builder for Firestore
+    - Apply filters to item feed
+    - _Requirements: 3.3_
+  
+  - [x]\* 7.6 Write property test for filter correctness
+    - **Property 7: Filter Result Correctness**
+    - **Validates: Requirements 3.3**
+  
+  - [x] 7.7 Create Dashboard page
+    - Integrate ItemFeed, SearchBar, and FilterPanel
+    - Add QuickStats component showing user statistics
+    - Include floating "Report Item" button
+    - _Requirements: 3.1, 8.2_
+- [x] 
+  
+  8. Item Detail View
+  
+  - [x] 8.1 Create ItemDetail page
+    - Display full item information with photo gallery
+    - Show reporter information
+    - Display QR code for the item
+    - _Requirements: 3.4_
+  - [x] 8.2 Implement PhotoGallery component
+    - Create image carousel/gallery view
+    - Support zoom and fullscreen viewing
+    - _Requirements: 3.4_
+  - [x] 8.3 Add action buttons
+    - "Claim Item" button for found items
+    - "Message Poster" button
+    - "Share" button with copy link functionality
+    - _Requirements: 3.4, 4.1_
+- [x] 
+  
+  9. Checkpoint - Ensure all tests pass
+    
+  
+  - Ensure all tests pass, ask the user if questions arise.
+- [x] 
+  
+  10. Claims Management
+  
+  - [x] 10.1 Create ClaimForm component
+    - Build proof of ownership text input (min 50 chars)
+    - Add optional proof image upload
+    - Include acknowledgment checkbox
+    - _Requirements: 4.1_
+  
+  - [x]\* 10.2 Write property test for claim proof validation
+    - **Property 8: Claim Proof Minimum Length**
+    - **Validates: Requirements 4.1**
+  
+  - [x] 10.3 Implement claim submission service
+    - Create Firestore service for claim operations
+    - Update item status to "Pending_Claim" on submission
+    - Prevent self-claims (reporter cannot claim own item)
+    - Send notification to item reporter
+    - _Requirements: 4.1, 4.2, 4.6_
+  
+  - [x]\* 10.4 Write property test for self-claim prevention
+    - **Property 10: Self-Claim Prevention**
+    - **Validates: Requirements 4.6**
+  - [x]\* 10.5 Write property test for claim status transition
+    - **Property 9: Claim Status Transition**
+    - \*\*Validates: Requirements 4.2\_
+  
+  - [x] 10.6 Create ClaimReview component
+    - Display claim details and proof to finder
+    - Add Approve/Reject buttons with optional notes
+    - _Requirements: 4.3_
+  - [x] 10.7 Implement claim approval workflow
+    - Update claim status on approval/rejection
+    - Create messaging channel on approval
+    - Restore item status on rejection
+    - Send notifications to claimant
+    - _Requirements: 4.4, 4.5_
+  - [x] 10.8 Create Claims page
+    - List user's submitted claims with status
+    - List claims received on user's found items
+    - Link to ClaimReview for pending claims
+    - _Requirements: 4.3_
+- [x] 
+  
+  11. Checkpoint - Ensure all tests pass
+  
+  - All 154 tests passing (11 test files)
+  - Build successful with no TypeScript errors
+- [x] 
+  
+  12. Messaging System
+  
+  - [x] 12.1 Implement message service
+    - Create Firestore service for message operations
+    - Set up real-time listener for new messages
+    - Mark messages as read when viewed
+    - _Requirements: 5.1, 5.2_
+  - [x] 12.2 Create ConversationList component
+    - Display list of active conversations
+    - Show unread message indicator
+    - Sort by most recent message
+    - _Requirements: 5.3_
+  - [x] 12.3 Create ChatWindow component
+    - Display messages in chronological order
+    - Show sender info and timestamps
+    - Include message input with send button
+    - _Requirements: 5.2, 5.4_
+  
+  - [x]\* 12.4 Write property test for message ordering
+    - **Property 11: Message Chronological Order**
+    - **Validates: Requirements 5.4**
+  
+  - [x] 12.5 Create Messages page
+    - Integrate ConversationList and ChatWindow
+    - Handle conversation selection
+    - _Requirements: 5.1, 5.2, 5.3, 5.4_
+- [x] 
+  
+  13. Notifications System
+  
+  - [x] 13.1 Implement notification service
+    - Create Firestore service for notification operations
+    - Set up real-time listener for new notifications
+    - Implement mark as read functionality
+    - _Requirements: 6.1, 6.2, 6.3, 6.4_
+  - [x] 13.2 Create NotificationList component
+    - Display notifications with read/unread styling
+    - Show notification type icon and content
+    - Link to related item/claim when applicable
+    - _Requirements: 6.4_
+  - [x] 13.3 Add notification indicator to header
+    - Show bell icon with unread count badge
+    - Dropdown preview of recent notifications
+    - _Requirements: 6.4_
+- [x] 
+  
+  14. QR Code Verification
+  
+  - [x] 14.1 Implement QR code generation
+    - Generate unique QR code for approved claims
+    - Encode claim ID and verification token
+    - Display QR code in claim detail view
+    - _Requirements: 7.1_
+  - [x] 14.2 Create QR scanner component
+    - Implement camera-based QR code scanning
+    - Validate scanned code against claim records
+    - _Requirements: 7.2_
+  
+  - [x]\* 14.3 Write property test for QR validation
+    - **Property 12: Handover QR Validation**
+    - **Validates: Requirements 7.2**
+  
+  - [x] 14.4 Implement handover completion
+    - Update item status to "Returned" on valid scan
+    - Update both users' transaction history
+    - Increment finder's reputation score
+    - _Requirements: 7.3, 8.3_
+  
+  - [x]\* 14.5 Write property test for handover completion
+    - **Property 13: Handover Completion State**
+    - **Validates: Requirements 7.3**
+  - [x]\* 14.6 Write property test for reputation increment
+    - **Property 14: Reputation Score Increment**
+    - **Validates: Requirements 8.3**
+- [x] 
+  
+  15. Checkpoint - Ensure all tests pass
+  
+  - All 174 tests passing (13 test files)
+  - Build successful with no TypeScript errors
+- [x] 
+  
+  16. User Profile
+  
+  - [x] 16.1 Create Profile page
+    - Display user name, role, and department
+    - Show reputation score and badges
+    - _Requirements: 8.1_
+  - [x] 16.2 Implement user statistics
+    - Calculate items reported, returned, active claims
+    - Display statistics dashboard
+    - _Requirements: 8.2_
+  - [x] 16.3 Add user activity history
+    - List user's reported items
+    - List user's claims and their statuses
+    - _Requirements: 8.1, 8.2_
+- [x] 
+  
+  17. SID Admin Dashboard
+  
+  - [x] 17.1 Create AdminDashboard page
+    - Design layout optimized for Tablet view
+    - Display stats cards: Total Items, Pending Claims, Returned, Recovery Rate
+    - Show items in custody count
+    - List unclaimed items approaching expiry
+    - _Requirements: 9.1_
+  - [x] 17.2 Implement TurnoverManager component
+    - List pending turnover tickets
+    - QR scanner for receiving items
+    - Confirm receipt functionality
+    - _Requirements: 9.2_
+  - [x] 17.3 Implement ClaimVerification component
+    - List high-value claims pending admin review
+    - Display claim details and proof
+    - Approve/reject with verification notes
+    - _Requirements: 9.3_
+  - [x] 17.4 Create Analytics component
+    - Display recovery rate statistics with trend graphs
+    - Show item category breakdown chart
+    - Display reporting trends over time
+    - Implement "Recent Activity" table (Date, Item, Location, Status)
+    - _Requirements: 9.4_
+  - [x] 17.5 Implement item lifecycle management
+    - Flag items exceeding retention period
+    - Allow status update to Disposed/Donated
+    - _Requirements: 9.5_
+- [x] 
+  
+  18. PWA Configuration
+  
+  - [x] 18.1 Configure service worker
+    - Set up Vite PWA plugin
+    - Configure caching strategies
+    - _Requirements: Technical foundation_
+  - [x] 18.2 Create app manifest
+    - Define app name, icons, and theme colors
+    - Configure display mode and start URL
+    - _Requirements: Technical foundation_
+  - [x] 18.3 Implement offline support
+    - Cache critical assets
+    - Show offline indicator when disconnected
+    - _Requirements: Technical foundation_
+- [x] 
+  
+  19. Final Integration and Polish
+  
+  - [x] 19.1 Implement responsive layout
+    - Ensure all pages work on mobile, tablet, and desktop
+    - Test navigation and interactions on different screen sizes
+    - _Requirements: Technical foundation_
+  - [x] 19.2 Add loading states and error boundaries
+    - Create loading spinners and skeleton screens
+    - Implement error boundary components
+    - _Requirements: Technical foundation_
+  - [x] 19.3 Accessibility improvements
+    - Add ARIA labels and roles
+    - Ensure keyboard navigation
+    - Test with screen reader
+    - _Requirements: Technical foundation_
+- [x] 
+  
+  20. Final Checkpoint - Ensure all tests pass
+  
+  - All 174 tests passing (13 test files)
+  - Build successful with no TypeScript errors
