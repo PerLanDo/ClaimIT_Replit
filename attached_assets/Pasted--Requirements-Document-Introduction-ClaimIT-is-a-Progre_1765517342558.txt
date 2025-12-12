@@ -1,0 +1,163 @@
+# Requirements Document
+
+## Introduction
+
+ClaimIT is a Progressive Web Application (PWA) designed to modernize the lost and found management system at MSU-IIT. The prototype aims to replace the current manual, paper-based process with a centralized digital platform that enables students, faculty, and staff to report, search, and recover lost items. The system supports both peer-to-peer coordination and centralized SID (Security Intelligence Division) management, with the goal of increasing item recovery rates from 20-30% to over 60%.
+
+## Glossary
+
+- **ClaimIT**: The Progressive Web Application for campus lost and found management
+- **SID**: Security Intelligence Division - campus security office that manages high-value found items
+- **PWA**: Progressive Web Application - web app with native app-like capabilities
+- **P2P (Peer-to-Peer)**: Direct coordination between finder and owner without SID involvement
+- **Centralized Mode**: Items turned over to SID for secure storage and verification
+- **Claim**: A request by a user asserting ownership of a found item
+- **Reporter**: User who posts a lost or found item report
+- **Claimant**: User who submits a claim for a found item
+- **High-Value Item**: Items like electronics, wallets, IDs that require SID turnover
+- **Turnover**: The process of surrendering a found item to SID
+- **QR Code**: Quick Response code generated for item verification during handover
+
+## Requirements
+
+### Requirement 1: User Authentication
+
+**User Story:** As a campus community member, I want to securely log in using my university credentials, so that my identity is verified and I can access the system.
+
+#### Acceptance Criteria
+
+1. WHEN a user accesses ClaimIT THEN ClaimIT SHALL display a login interface with the "Sign in with My.IIT" button and "Managed by SID & ICTC" footer
+2. WHEN a user successfully authenticates THEN ClaimIT SHALL assign the appropriate role (Student, Faculty, Staff, or SID_Admin) based on their account type
+3. WHEN a user logs out THEN ClaimIT SHALL clear all session data and redirect to the landing page
+4. WHEN an unauthenticated user attempts to access protected features THEN ClaimIT SHALL redirect the user to the login page
+
+### Requirement 2: Item Reporting
+
+**User Story:** As a user, I want to report lost or found items with detailed information and photos, so that items can be matched and recovered.
+
+#### Acceptance Criteria
+
+1. WHEN a user initiates a report THEN ClaimIT SHALL display a toggle to select between "I LOST something" (Red theme) and "I FOUND something" (Gold theme)
+2. WHEN a user selects "I LOST something" THEN ClaimIT SHALL display fields for Title, Category, Location, and Photo Upload
+3. WHEN a user selects "I FOUND something" THEN ClaimIT SHALL display options to "Turn over to SID" or "Keep for Peer-to-Peer"
+4. WHEN a user uploads photos for a Wallet category THEN ClaimIT SHALL display a warning: "For Wallets: Upload photo of EXTERIOR only. Do not photograph contents."
+5. WHEN a user uploads photos THEN ClaimIT SHALL accept up to 5 images in JPEG or PNG format with maximum 5MB each
+6. WHEN a user reports a found high-value item THEN ClaimIT SHALL display instructions to surrender the item to SID within 24 hours
+7. WHEN an item report is successfully submitted THEN ClaimIT SHALL generate a unique QR code linked to the item details
+8. WHEN a user attempts to submit a report with empty required fields THEN ClaimIT SHALL display validation errors and prevent submission
+
+### Requirement 3: Item Browsing and Search
+
+**User Story:** As a user, I want to browse and search for items, so that I can find my lost belongings or identify owners of found items.
+
+#### Acceptance Criteria
+
+1. WHEN a user views the dashboard THEN ClaimIT SHALL display a feed of recent items with tabs for "LOST", "FOUND", and "ALL"
+2. WHEN a user views the dashboard THEN ClaimIT SHALL display a Floating Action Button (+) to quickly report an item
+3. WHEN a user searches for items THEN ClaimIT SHALL return results matching the search keywords in title or description
+4. WHEN a user applies filters THEN ClaimIT SHALL filter results by category, status, date range, and location
+5. WHEN a user selects an item from the list THEN ClaimIT SHALL display the full item details including photos, description, location, date, and reporter information
+
+### Requirement 4: Claims Management
+
+**User Story:** As a user who found my lost item, I want to submit a claim with proof of ownership, so that I can recover my belongings.
+
+#### Acceptance Criteria
+
+1. WHEN a user submits a claim for a found item THEN ClaimIT SHALL require a proof of ownership description with minimum 50 characters
+2. WHEN a user submits a claim THEN ClaimIT SHALL allow uploading a secondary file (image/document) as proof
+3. WHEN a claim is submitted THEN ClaimIT SHALL change the item status to "Pending_Claim" and notify the item reporter
+4. WHEN a finder reviews a claim THEN ClaimIT SHALL display the claimant's proof and allow the finder to approve or reject the claim
+5. WHEN a claim is approved THEN ClaimIT SHALL open a messaging channel between finder and claimant for coordination
+6. WHEN a claim is rejected THEN ClaimIT SHALL notify the claimant with the rejection reason and restore the item to available status
+7. IF a user attempts to claim their own reported item THEN ClaimIT SHALL prevent the claim submission
+
+### Requirement 5: In-App Messaging
+
+**User Story:** As a user, I want to communicate with other users about items without revealing my personal contact information, so that I can coordinate item recovery safely.
+
+#### Acceptance Criteria
+
+1. WHEN two users need to coordinate about an item THEN ClaimIT SHALL provide a secure messaging channel linked to that item
+2. WHEN a user sends a message THEN ClaimIT SHALL deliver the message in real-time to the recipient
+3. WHEN a user receives a new message THEN ClaimIT SHALL display a notification indicator
+4. WHEN a user views a conversation THEN ClaimIT SHALL display all messages in chronological order with timestamps and sender information
+
+### Requirement 6: Notifications
+
+**User Story:** As a user, I want to receive notifications about my items and claims, so that I stay informed about important updates.
+
+#### Acceptance Criteria
+
+1. WHEN an item matching a user's lost report is found THEN ClaimIT SHALL send a notification to the user
+2. WHEN a claim status changes THEN ClaimIT SHALL notify the relevant users (claimant and reporter)
+3. WHEN a user receives a new message THEN ClaimIT SHALL send a notification to the recipient
+4. WHEN a user views notifications THEN ClaimIT SHALL display all notifications with read/unread status and allow marking as read
+
+### Requirement 7: QR Code Verification
+
+**User Story:** As a user completing a handover, I want to verify the transaction using a QR code, so that the exchange is properly documented.
+
+#### Acceptance Criteria
+
+1. WHEN a claim is approved and ready for handover THEN ClaimIT SHALL generate a unique QR code for the claimant
+2. WHEN a finder scans the claimant's QR code THEN ClaimIT SHALL validate the code and display confirmation
+3. WHEN a valid QR code is scanned THEN ClaimIT SHALL mark the item as "Returned" and update both users' transaction history
+
+### Requirement 8: User Profile and Statistics
+
+**User Story:** As a user, I want to view my profile and activity statistics, so that I can track my contributions and history.
+
+#### Acceptance Criteria
+
+1. WHEN a user views their profile THEN ClaimIT SHALL display their name, role, and reputation score
+2. WHEN a user views their dashboard THEN ClaimIT SHALL display statistics including items reported, items returned, and active claims
+3. WHEN a user successfully returns an item THEN ClaimIT SHALL increment their reputation score
+
+### Requirement 9: SID Admin Dashboard
+
+**User Story:** As an SID administrator, I want to manage items, verify claims, and view analytics, so that I can efficiently oversee the lost and found system.
+
+#### Acceptance Criteria
+
+1. WHEN an SID admin logs in THEN ClaimIT SHALL display an admin dashboard optimized for tablet view
+2. WHEN viewing the dashboard THEN ClaimIT SHALL display key statistics cards: "Total Items", "Pending Claims", "Returned", and "Recovery Rate" with trend graphs
+3. WHEN viewing the dashboard THEN ClaimIT SHALL display a "Recent Activity" table showing Date, Item, Location, and Status
+4. WHEN an SID admin receives a turnover THEN ClaimIT SHALL allow the admin to scan the turnover ticket and confirm receipt
+5. WHEN an SID admin reviews a high-value claim THEN ClaimIT SHALL display the claim details and allow approval or rejection with verification notes
+6. WHEN an item exceeds the retention period THEN ClaimIT SHALL flag the item for disposal and allow the admin to update its final status
+
+### Requirement 10: Data Persistence and Serialization
+
+**User Story:** As a system, I want to persist all data reliably, so that users can access their information across sessions.
+
+#### Acceptance Criteria
+
+1. WHEN item data is stored THEN ClaimIT SHALL serialize the item object to JSON format for Firestore storage
+2. WHEN item data is retrieved THEN ClaimIT SHALL deserialize the JSON data back to the original item object structure
+3. WHEN user data is stored THEN ClaimIT SHALL serialize the user profile to JSON format for Firestore storage
+4. WHEN user data is retrieved THEN ClaimIT SHALL deserialize the JSON data back to the original user object structure
+5. WHEN claim data is stored THEN ClaimIT SHALL serialize the claim object to JSON format for Firestore storage
+6. WHEN claim data is retrieved THEN ClaimIT SHALL deserialize the JSON data back to the original claim object structure
+
+### Requirement 11: UI/UX Design System
+
+**User Story:** As a user, I want a visually consistent and accessible interface that adheres to MSU-IIT branding, so that the application is easy to use and recognizable.
+
+#### Acceptance Criteria
+
+1. WHEN the application loads THEN it SHALL detect the user's system preference for Light or Dark mode and apply the appropriate theme
+2. WHEN in Light Mode THEN the application SHALL use:
+  - Primary Color: Maroon (`#800000`)
+  - Secondary Color: Gold (`#FFD700`)
+  - Background: Off-white gradient (`#F5F5F5` to `#FAFAFA`)
+  - Text: Dark gray (`#333333`)
+3. WHEN in Dark Mode THEN the application SHALL use:
+  - Primary Color: Bright Maroon (`#C92A2A`)
+  - Secondary Color: Brighter Gold (`#FFD43B`)
+  - Background: Dark gradient (`#1A1B1E` to `#25262B`)
+  - Text: Light gray (`#F1F3F5`)
+4. WHEN displaying interactive elements THEN the application SHALL use specific gradients:
+  - Primary Gradient: `linear-gradient(135deg, #800000 0%, #A00000 50%, #600000 100%)` (Light) / `linear-gradient(135deg, #C92A2A 0%, #A61E1E 50%, #800000 100%)` (Dark)
+  - Gold Gradient: `linear-gradient(135deg, #FFD700 0%, #FFDF40 50%, #D4A745 100%)` (Light) / `linear-gradient(135deg, #FFD43B 0%, #FFC107 50%, #FF9800 100%)` (Dark)
+5. WHEN displaying cards THEN the application SHALL use specific shadows based on elevation (Small, Medium, Large, Extra Large) as defined in the design system
