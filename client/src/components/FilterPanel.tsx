@@ -33,13 +33,14 @@ interface FilterPanelProps {
 
 const categories: { value: ItemCategory; label: string }[] = [
   { value: 'electronics', label: 'Electronics' },
-  { value: 'wallet', label: 'Wallet' },
+  { value: 'wallets', label: 'Wallets' },
   { value: 'keys', label: 'Keys' },
-  { value: 'documents', label: 'Documents' },
+  { value: 'ids_cards', label: 'IDs & Cards' },
   { value: 'clothing', label: 'Clothing' },
-  { value: 'accessories', label: 'Accessories' },
   { value: 'bags', label: 'Bags' },
   { value: 'books', label: 'Books' },
+  { value: 'tumblers', label: 'Tumblers' },
+  { value: 'umbrellas', label: 'Umbrellas' },
   { value: 'other', label: 'Other' },
 ];
 

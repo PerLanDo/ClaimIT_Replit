@@ -58,7 +58,7 @@ export function ItemDetailPage({ item, onBack, onMessage, onClaimSuccess }: Item
     onClaimSuccess?.();
   };
 
-  const canClaim = item.type === 'found' && item.status === 'found';
+  const canClaim = item.type === 'found' && item.status === 'open';
 
   return (
     <div className="max-w-2xl mx-auto space-y-4 pb-24">
@@ -72,7 +72,7 @@ export function ItemDetailPage({ item, onBack, onMessage, onClaimSuccess }: Item
         <ArrowLeft className="h-5 w-5" />
       </Button>
 
-      <PhotoGallery photos={item.photos} alt={item.title} />
+      <PhotoGallery photos={item.imageUrls} alt={item.title} />
 
       <Card className="p-6 space-y-4">
         <div className="flex items-start justify-between gap-4">
@@ -94,13 +94,12 @@ export function ItemDetailPage({ item, onBack, onMessage, onClaimSuccess }: Item
 
         <div className="flex items-center gap-3 py-3 border-y border-border">
           <Avatar>
-            <AvatarImage src={item.reporterAvatar} />
             <AvatarFallback className="bg-primary text-primary-foreground">
-              {getInitials(item.reporterName)}
+              {item.reporterId.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{item.reporterName}</p>
+            <p className="font-medium">Reporter ID: {item.reporterId.substring(0, 8)}</p>
             <p className="text-sm text-muted-foreground">
               {item.type === 'lost' ? 'Lost by' : 'Found by'}
             </p>
@@ -114,7 +113,7 @@ export function ItemDetailPage({ item, onBack, onMessage, onClaimSuccess }: Item
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>{format(new Date(item.date), 'MMMM d, yyyy')}</span>
+            <span>{format(new Date(item.dateLostFound), 'MMMM d, yyyy')}</span>
           </div>
         </div>
 

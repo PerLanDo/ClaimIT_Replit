@@ -17,21 +17,21 @@ interface ActivityTableProps {
 
 export function ActivityTable({ items, onItemClick }: ActivityTableProps) {
   const statusColors = {
-    lost: 'bg-destructive text-destructive-foreground',
-    found: 'bg-gold text-gold-foreground',
+    open: 'bg-gold text-gold-foreground',
     pending_claim: 'bg-amber-500 text-white',
-    claimed: 'bg-blue-500 text-white',
     returned: 'bg-green-500 text-white',
-    expired: 'bg-muted text-muted-foreground',
+    surrendered_sid: 'bg-blue-500 text-white',
+    archived: 'bg-muted text-muted-foreground',
+    disposed: 'bg-gray-500 text-white',
   };
 
   const statusLabels = {
-    lost: 'Lost',
-    found: 'Found',
+    open: 'Open',
     pending_claim: 'Pending',
-    claimed: 'Claimed',
     returned: 'Returned',
-    expired: 'Expired',
+    surrendered_sid: 'SID',
+    archived: 'Archived',
+    disposed: 'Disposed',
   };
 
   return (
@@ -54,7 +54,7 @@ export function ActivityTable({ items, onItemClick }: ActivityTableProps) {
               data-testid={`activity-row-${item.id}`}
             >
               <TableCell className="text-sm text-muted-foreground">
-                {format(new Date(item.createdAt), 'MMM d, yyyy')}
+                {format(new Date(item.dateReported), 'MMM d, yyyy')}
               </TableCell>
               <TableCell className="font-medium">{item.title}</TableCell>
               <TableCell className="text-sm text-muted-foreground">

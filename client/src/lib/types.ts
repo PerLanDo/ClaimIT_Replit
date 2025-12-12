@@ -1,88 +1,105 @@
-export type UserRole = 'student' | 'faculty' | 'staff' | 'sid_admin';
+export type UserRole = "student" | "faculty" | "staff" | "sid_admin";
 
-export type ItemStatus = 'lost' | 'found' | 'pending_claim' | 'claimed' | 'returned' | 'expired';
+export type ItemStatus =
+  | "open"
+  | "pending_claim"
+  | "returned"
+  | "surrendered_sid"
+  | "archived"
+  | "disposed";
 
-export type ItemCategory = 
-  | 'electronics' 
-  | 'wallet' 
-  | 'keys' 
-  | 'documents' 
-  | 'clothing' 
-  | 'accessories' 
-  | 'bags' 
-  | 'books' 
-  | 'other';
+export type ItemCategory =
+  | "electronics"
+  | "wallets"
+  | "keys"
+  | "ids_cards"
+  | "clothing"
+  | "bags"
+  | "books"
+  | "tumblers"
+  | "umbrellas"
+  | "other";
 
-export type ClaimStatus = 'pending' | 'approved' | 'rejected';
+export type ClaimStatus = "pending" | "approved" | "rejected" | "completed";
 
-export type NotificationType = 'claim_submitted' | 'claim_approved' | 'claim_rejected' | 'new_message' | 'item_match';
+export type NotificationType =
+  | "claim_update"
+  | "new_message"
+  | "item_match"
+  | "turnover_reminder"
+  | "system";
 
 export interface User {
   id: string;
   email: string;
-  displayName: string;
+  fullName: string;
   role: UserRole;
-  avatarUrl?: string;
   reputationScore: number;
-  department?: string;
+  department?: string | null;
+  createdAt: Date;
 }
 
 export interface Item {
   id: string;
-  title: string;
-  description: string;
+  reporterId: string;
+  type: "lost" | "found";
   category: ItemCategory;
   status: ItemStatus;
-  type: 'lost' | 'found';
+  title: string;
+  description: string;
   location: string;
-  date: Date;
-  photos: string[];
-  reporterId: string;
-  reporterName: string;
-  reporterAvatar?: string;
-  qrCode?: string;
+  imageUrls: string[];
+  isHighValue: boolean;
+  dateReported: Date;
+  dateLostFound: Date;
+  qrCode?: string | null;
   turnoverToSID: boolean;
-  createdAt: Date;
 }
 
 export interface Claim {
   id: string;
   itemId: string;
   claimantId: string;
-  claimantName: string;
-  claimantAvatar?: string;
-  proofDescription: string;
-  proofImage?: string;
   status: ClaimStatus;
-  reviewNotes?: string;
-  createdAt: Date;
+  proofDescription: string;
+  proofImageUrl?: string | null;
+  dateFiled: Date;
+  reviewedBy?: string | null;
+  reviewNotes?: string | null;
+  handoverQrCode?: string | null;
 }
 
 export interface Message {
   id: string;
-  conversationId: string;
+  itemId: string;
   senderId: string;
-  senderName: string;
+  receiverId: string;
   content: string;
   timestamp: Date;
-  read: boolean;
+  isRead: boolean;
 }
 
 export interface Conversation {
-  id: string;
   itemId: string;
-  itemTitle: string;
-  participants: string[];
-  lastMessage?: Message;
-  unreadCount: number;
+  otherUserId: string;
+  lastMessage: Message;
 }
 
 export interface Notification {
   id: string;
+  userId: string;
   type: NotificationType;
-  title: string;
-  message: string;
-  itemId?: string;
-  read: boolean;
-  createdAt: Date;
+  content: string;
+  relatedItemId?: string | null;
+  isRead: boolean;
+  timestamp: Date;
+}
+
+export interface TurnoverLog {
+  id: string;
+  itemId: string;
+  officerId: string;
+  dateReceived: Date;
+  dateReleased?: Date | null;
+  remarks?: string | null;
 }

@@ -10,19 +10,19 @@ interface NotificationListProps {
 }
 
 const notificationIcons: Record<NotificationType, typeof Bell> = {
-  claim_submitted: Bell,
-  claim_approved: Check,
-  claim_rejected: X,
+  claim_update: Bell,
   new_message: MessageCircle,
   item_match: Search,
+  turnover_reminder: Bell,
+  system: Bell,
 };
 
 const notificationColors: Record<NotificationType, string> = {
-  claim_submitted: 'bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400',
-  claim_approved: 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400',
-  claim_rejected: 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400',
+  claim_update: 'bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400',
   new_message: 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400',
   item_match: 'bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400',
+  turnover_reminder: 'bg-amber-100 text-amber-600 dark:bg-amber-900 dark:text-amber-400',
+  system: 'bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400',
 };
 
 export function NotificationList({ 
@@ -51,7 +51,7 @@ export function NotificationList({
             onClick={() => onNotificationClick(notification)}
             className={cn(
               "w-full p-4 text-left hover-elevate transition-colors",
-              !notification.read && "bg-accent/50"
+              !notification.isRead && "bg-accent/50"
             )}
             data-testid={`notification-${notification.id}`}
           >
@@ -67,21 +67,21 @@ export function NotificationList({
                 <div className="flex items-start justify-between gap-2">
                   <p className={cn(
                     "font-medium line-clamp-1",
-                    !notification.read && "text-foreground"
+                    !notification.isRead && "text-foreground"
                   )}>
-                    {notification.title}
+                    Notification
                   </p>
-                  {!notification.read && (
+                  {!notification.isRead && (
                     <span className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-2" />
                   )}
                 </div>
 
                 <p className="text-sm text-muted-foreground line-clamp-2 mt-0.5">
-                  {notification.message}
+                  {notification.content}
                 </p>
 
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
                 </p>
               </div>
             </div>

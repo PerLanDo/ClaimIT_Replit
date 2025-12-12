@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { PhotoUpload } from './PhotoUpload';
-import { Building2, Handshake } from 'lucide-react';
-import type { ItemCategory } from '@/lib/types';
+} from "@/components/ui/select";
+import { PhotoUpload } from "./PhotoUpload";
+import { Building2, Handshake } from "lucide-react";
+import type { ItemCategory } from "@/lib/types";
 
-type ReportType = 'lost' | 'found';
+type ReportType = "lost" | "found";
 
 interface ItemFormData {
   title: string;
-  category: ItemCategory | '';
+  category: ItemCategory | "";
   location: string;
   description: string;
   photos: string[];
@@ -31,50 +31,58 @@ interface ItemFormProps {
 }
 
 const categories: { value: ItemCategory; label: string }[] = [
-  { value: 'electronics', label: 'Electronics' },
-  { value: 'wallet', label: 'Wallet' },
-  { value: 'keys', label: 'Keys' },
-  { value: 'documents', label: 'Documents' },
-  { value: 'clothing', label: 'Clothing' },
-  { value: 'accessories', label: 'Accessories' },
-  { value: 'bags', label: 'Bags' },
-  { value: 'books', label: 'Books' },
-  { value: 'other', label: 'Other' },
+  { value: "electronics", label: "Electronics" },
+  { value: "wallets", label: "Wallets" },
+  { value: "keys", label: "Keys" },
+  { value: "ids_cards", label: "IDs & Cards" },
+  { value: "clothing", label: "Clothing" },
+  { value: "bags", label: "Bags" },
+  { value: "books", label: "Books" },
+  { value: "tumblers", label: "Tumblers" },
+  { value: "umbrellas", label: "Umbrellas" },
+  { value: "other", label: "Other" },
 ];
 
 const locations = [
-  'CCS Building',
-  'COE Building',
-  'SET Building',
-  'Library',
-  'Gymnasium',
-  'Cafeteria',
-  'Administration Building',
-  'IIT Oval',
-  'Other',
+  "CCS Building",
+  "COE Building",
+  "SET Building",
+  "Library",
+  "Gymnasium",
+  "Cafeteria",
+  "Administration Building",
+  "IIT Oval",
+  "Other",
 ];
 
 export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
-  const [reportType, setReportType] = useState<ReportType>('lost');
+  const [reportType, setReportType] = useState<ReportType>("lost");
   const [formData, setFormData] = useState<ItemFormData>({
-    title: '',
-    category: '',
-    location: '',
-    description: '',
+    title: "",
+    category: "",
+    location: "",
+    description: "",
     photos: [],
     turnoverToSID: false,
   });
+  const [customLocation, setCustomLocation] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const showWalletWarning = formData.category === 'wallet';
-  const isHighValue = ['electronics', 'wallet', 'documents'].includes(formData.category);
+  const showWalletWarning = formData.category === "wallets";
+  const isHighValue = ["electronics", "wallets", "ids_cards"].includes(
+    formData.category
+  );
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formData.title.trim()) newErrors.title = 'Title is required';
-    if (!formData.category) newErrors.category = 'Category is required';
-    if (!formData.location) newErrors.location = 'Location is required';
-    if (!formData.description.trim()) newErrors.description = 'Description is required';
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.category) newErrors.category = "Category is required";
+    if (!formData.location) newErrors.location = "Location is required";
+    if (formData.location === "Other" && !customLocation.trim()) {
+      newErrors.customLocation = "Please specify the location";
+    }
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -82,7 +90,13 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-      onSubmit(formData, reportType);
+      // If "Other" is selected, use the custom location
+      const finalData = {
+        ...formData,
+        location:
+          formData.location === "Other" ? customLocation : formData.location,
+      };
+      onSubmit(finalData, reportType);
     }
   };
 
@@ -91,11 +105,11 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
       <div className="flex rounded-lg overflow-hidden border border-border">
         <button
           type="button"
-          onClick={() => setReportType('lost')}
+          onClick={() => setReportType("lost")}
           className={`flex-1 py-3 px-4 font-medium transition-colors ${
-            reportType === 'lost'
-              ? 'bg-destructive text-destructive-foreground'
-              : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            reportType === "lost"
+              ? "bg-destructive text-destructive-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
           data-testid="button-report-lost"
         >
@@ -103,11 +117,11 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
         </button>
         <button
           type="button"
-          onClick={() => setReportType('found')}
+          onClick={() => setReportType("found")}
           className={`flex-1 py-3 px-4 font-medium transition-colors ${
-            reportType === 'found'
-              ? 'bg-gold text-gold-foreground'
-              : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            reportType === "found"
+              ? "bg-gold text-gold-foreground"
+              : "bg-muted text-muted-foreground hover:bg-muted/80"
           }`}
           data-testid="button-report-found"
         >
@@ -121,18 +135,24 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
           <Input
             id="title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             placeholder="e.g., Blue iPhone 14"
             data-testid="input-title"
           />
-          {errors.title && <p className="text-sm text-destructive">{errors.title}</p>}
+          {errors.title && (
+            <p className="text-sm text-destructive">{errors.title}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="category">Category *</Label>
           <Select
             value={formData.category}
-            onValueChange={(value) => setFormData({ ...formData, category: value as ItemCategory })}
+            onValueChange={(value) =>
+              setFormData({ ...formData, category: value as ItemCategory })
+            }
           >
             <SelectTrigger data-testid="select-category">
               <SelectValue placeholder="Select a category" />
@@ -145,14 +165,21 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
               ))}
             </SelectContent>
           </Select>
-          {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
+          {errors.category && (
+            <p className="text-sm text-destructive">{errors.category}</p>
+          )}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="location">Location *</Label>
           <Select
             value={formData.location}
-            onValueChange={(value) => setFormData({ ...formData, location: value })}
+            onValueChange={(value) => {
+              setFormData({ ...formData, location: value });
+              if (value !== "Other") {
+                setCustomLocation("");
+              }
+            }}
           >
             <SelectTrigger data-testid="select-location">
               <SelectValue placeholder="Where was it lost/found?" />
@@ -165,20 +192,44 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
               ))}
             </SelectContent>
           </Select>
-          {errors.location && <p className="text-sm text-destructive">{errors.location}</p>}
+          {errors.location && (
+            <p className="text-sm text-destructive">{errors.location}</p>
+          )}
         </div>
+
+        {formData.location === "Other" && (
+          <div className="space-y-2">
+            <Label htmlFor="customLocation">Specify Location *</Label>
+            <Input
+              id="customLocation"
+              value={customLocation}
+              onChange={(e) => setCustomLocation(e.target.value)}
+              placeholder="e.g., Near the parking lot, Room 301, etc."
+              data-testid="input-custom-location"
+            />
+            {errors.customLocation && (
+              <p className="text-sm text-destructive">
+                {errors.customLocation}
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="space-y-2">
           <Label htmlFor="description">Description *</Label>
           <Textarea
             id="description"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             placeholder="Describe the item in detail (color, brand, distinguishing features...)"
             rows={4}
             data-testid="textarea-description"
           />
-          {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+          {errors.description && (
+            <p className="text-sm text-destructive">{errors.description}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -190,17 +241,19 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
           />
         </div>
 
-        {reportType === 'found' && (
+        {reportType === "found" && (
           <div className="space-y-3">
             <Label>What would you like to do with the item?</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, turnoverToSID: true })}
+                onClick={() =>
+                  setFormData({ ...formData, turnoverToSID: true })
+                }
                 className={`p-4 rounded-lg border-2 text-left transition-all ${
                   formData.turnoverToSID
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50'
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
                 }`}
                 data-testid="button-turnover-sid"
               >
@@ -212,11 +265,13 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
               </button>
               <button
                 type="button"
-                onClick={() => setFormData({ ...formData, turnoverToSID: false })}
+                onClick={() =>
+                  setFormData({ ...formData, turnoverToSID: false })
+                }
                 className={`p-4 rounded-lg border-2 text-left transition-all ${
                   !formData.turnoverToSID
-                    ? 'border-gold bg-gold/5'
-                    : 'border-border hover:border-gold/50'
+                    ? "border-gold bg-gold/5"
+                    : "border-border hover:border-gold/50"
                 }`}
                 data-testid="button-keep-p2p"
               >
@@ -236,13 +291,13 @@ export function ItemForm({ onSubmit, isLoading }: ItemFormProps) {
         )}
       </div>
 
-      <Button 
-        type="submit" 
-        className="w-full bg-gold text-gold-foreground hover:bg-gold/90"
+      <Button
+        type="submit"
+        className="w-full bg-gold text-gold-foreground hover:bg-gold/90 border-0"
         disabled={isLoading}
         data-testid="button-submit-report"
       >
-        {isLoading ? 'Submitting...' : 'Submit Report'}
+        {isLoading ? "Submitting..." : "Submit Report"}
       </Button>
     </form>
   );

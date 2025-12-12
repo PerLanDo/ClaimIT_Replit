@@ -1,11 +1,11 @@
-import { Bell, Search, Menu } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { ThemeToggle } from './ThemeToggle';
-import { useAuth } from '@/contexts/AuthContext';
-import logoImage from '@assets/generated_images/claimit_app_logo_design.png';
+import { Bell, Search, Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ThemeToggle } from "./ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
+import logoImage from "@assets/generated_images/claimit_app_logo_design.png";
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -26,8 +26,14 @@ export function Header({
 }: HeaderProps) {
   const { user } = useAuth();
 
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -45,7 +51,9 @@ export function Header({
           </Button>
           <div className="flex items-center gap-2">
             <img src={logoImage} alt="ClaimIT" className="h-8 w-8" />
-            <span className="font-bold text-lg text-primary hidden sm:block">ClaimIT</span>
+            <span className="font-bold text-lg text-primary hidden sm:block">
+              ClaimIT
+            </span>
           </div>
         </div>
 
@@ -66,7 +74,7 @@ export function Header({
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          
+
           <Button
             variant="ghost"
             size="icon"
@@ -76,12 +84,9 @@ export function Header({
           >
             <Bell className="h-5 w-5" />
             {notificationCount > 0 && (
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-              >
-                {notificationCount > 9 ? '9+' : notificationCount}
-              </Badge>
+              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs font-semibold">
+                {notificationCount > 9 ? "9+" : notificationCount}
+              </span>
             )}
           </Button>
 
@@ -93,9 +98,9 @@ export function Header({
             data-testid="button-profile"
           >
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user?.avatarUrl} alt={user?.displayName} />
+              <AvatarImage src={undefined} alt={user?.fullName} />
               <AvatarFallback className="bg-primary text-primary-foreground text-sm">
-                {user ? getInitials(user.displayName) : 'U'}
+                {getInitials(user?.fullName)}
               </AvatarFallback>
             </Avatar>
           </Button>

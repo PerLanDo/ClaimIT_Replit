@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import { ChevronLeft, ChevronRight, X, ZoomIn } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface PhotoGalleryProps {
   photos: string[];
   alt?: string;
 }
 
-export function PhotoGallery({ photos, alt = "Item photo" }: PhotoGalleryProps) {
+export function PhotoGallery({
+  photos,
+  alt = "Item photo",
+}: PhotoGalleryProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -43,7 +46,7 @@ export function PhotoGallery({ photos, alt = "Item photo" }: PhotoGalleryProps) 
         <Button
           variant="secondary"
           size="icon"
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute top-2 right-2 opacity-70 hover:opacity-100 transition-opacity bg-black/50 text-white hover:bg-black/70 border-0"
           onClick={() => setIsFullscreen(true)}
           data-testid="button-fullscreen"
         >
@@ -55,7 +58,7 @@ export function PhotoGallery({ photos, alt = "Item photo" }: PhotoGalleryProps) 
             <Button
               variant="secondary"
               size="icon"
-              className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute left-2 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 transition-opacity bg-black/50 text-white hover:bg-black/70 border-0"
               onClick={goToPrevious}
               data-testid="button-prev-photo"
             >
@@ -64,7 +67,7 @@ export function PhotoGallery({ photos, alt = "Item photo" }: PhotoGalleryProps) 
             <Button
               variant="secondary"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute right-2 top-1/2 -translate-y-1/2 opacity-70 hover:opacity-100 transition-opacity bg-black/50 text-white hover:bg-black/70 border-0"
               onClick={goToNext}
               data-testid="button-next-photo"
             >

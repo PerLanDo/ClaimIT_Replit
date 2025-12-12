@@ -1,17 +1,34 @@
-import { LogOut, Settings, Award, Package, CheckCircle, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { StatsCard } from '@/components/StatsCard';
-import { useAuth } from '@/contexts/AuthContext';
+import {
+  LogOut,
+  Settings,
+  Award,
+  Package,
+  CheckCircle,
+  Clock,
+  ArrowLeft,
+  BarChart3,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { StatsCard } from "@/components/StatsCard";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfilePageProps {
+  onBack?: () => void;
   onLogout?: () => void;
+  onSettings?: () => void;
+  onStatistics?: () => void;
 }
 
-export function ProfilePage({ onLogout }: ProfilePageProps) {
+export function ProfilePage({
+  onBack,
+  onLogout,
+  onSettings,
+  onStatistics,
+}: ProfilePageProps) {
   const { user, logout } = useAuth();
 
   const handleLogout = () => {
@@ -20,7 +37,12 @@ export function ProfilePage({ onLogout }: ProfilePageProps) {
   };
 
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   // todo: remove mock functionality
@@ -32,24 +54,43 @@ export function ProfilePage({ onLogout }: ProfilePageProps) {
   };
 
   const recentActivity = [
-    { action: 'Reported found item', item: 'Car Keys with Red Keychain', date: '2 days ago' },
-    { action: 'Claim approved', item: 'Silver MacBook Charger', date: '3 days ago' },
-    { action: 'Submitted claim', item: 'Blue iPhone 14 Pro', date: '4 days ago' },
+    {
+      action: "Reported found item",
+      item: "Car Keys with Red Keychain",
+      date: "2 days ago",
+    },
+    {
+      action: "Claim approved",
+      item: "Silver MacBook Charger",
+      date: "3 days ago",
+    },
+    {
+      action: "Submitted claim",
+      item: "Blue iPhone 14 Pro",
+      date: "4 days ago",
+    },
   ];
 
   return (
     <div className="space-y-6 pb-20 md:pb-4 max-w-2xl mx-auto">
+      {/* Header with Back Button */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={onBack}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="text-xl font-bold">Profile</h1>
+      </div>
+
       <Card className="p-6">
         <div className="flex items-start gap-4">
           <Avatar className="h-20 w-20">
-            <AvatarImage src={user?.avatarUrl} />
             <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-              {user ? getInitials(user.displayName) : 'U'}
+              {user ? getInitials(user.fullName) : "U"}
             </AvatarFallback>
           </Avatar>
 
           <div className="flex-1">
-            <h1 className="text-xl font-bold">{user?.displayName}</h1>
+            <h1 className="text-xl font-bold">{user?.fullName}</h1>
             <p className="text-sm text-muted-foreground">{user?.email}</p>
             <div className="flex items-center gap-2 mt-2">
               <Badge variant="secondary" className="capitalize">
@@ -61,7 +102,9 @@ export function ProfilePage({ onLogout }: ProfilePageProps) {
               </Badge>
             </div>
             {user?.department && (
-              <p className="text-sm text-muted-foreground mt-2">{user.department}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {user.department}
+              </p>
             )}
           </div>
         </div>
@@ -99,24 +142,36 @@ export function ProfilePage({ onLogout }: ProfilePageProps) {
                 <p className="text-sm font-medium">{activity.action}</p>
                 <p className="text-sm text-muted-foreground">{activity.item}</p>
               </div>
-              <p className="text-xs text-muted-foreground flex-shrink-0">{activity.date}</p>
+              <p className="text-xs text-muted-foreground flex-shrink-0">
+                {activity.date}
+              </p>
             </div>
           ))}
         </div>
       </Card>
 
       <Card className="p-2">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-3"
+          onClick={onStatistics}
+        >
+          <BarChart3 className="h-5 w-5" />
+          Statistics
+        </Button>
+        <Separator />
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-3"
           data-testid="button-settings"
+          onClick={onSettings}
         >
           <Settings className="h-5 w-5" />
           Settings
         </Button>
         <Separator />
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start gap-3 text-destructive hover:text-destructive"
           onClick={handleLogout}
           data-testid="button-logout"
