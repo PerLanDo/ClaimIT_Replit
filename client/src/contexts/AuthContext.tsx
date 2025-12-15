@@ -56,19 +56,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ) => {
     setIsLoading(true);
     try {
-      // Import dynamically to avoid circular dependencies
-      const { createUser } = await import("@/lib/firebaseService");
-      
-      const newUser = await createUser({
-        email,
-        fullName,
-        role,
-        department,
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, fullName, role, department }),
       });
 
-      setUser(newUser);
-      localStorage.setItem("claimit_user", JSON.stringify(newUser));
-      localStorage.setItem("claimit_user_id", newUser.id);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+
+      const { user: newUser } = await response.json();
+
+      // Convert date strings to Date objects
+      const userData = {
+        ...newUser,
+        createdAt: new Date(newUser.createdAt),
+      };
+
+      setUser(userData);
+      localStorage.setItem("claimit_user", JSON.stringify(userData));
+      localStorage.setItem("claimit_user_id", userData.id);
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
@@ -80,18 +89,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string) => {
     setIsLoading(true);
     try {
-      // Import dynamically to avoid circular dependencies
-      const { getUserByEmail } = await import("@/lib/firebaseService");
-      
-      const existingUser = await getUserByEmail(email);
-      
-      if (!existingUser) {
-        throw new Error("User not found. Please register first.");
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Login failed");
       }
 
-      setUser(existingUser);
-      localStorage.setItem("claimit_user", JSON.stringify(existingUser));
-      localStorage.setItem("claimit_user_id", existingUser.id);
+      const { user: existingUser } = await response.json();
+
+      // Convert date strings to Date objects
+      const userData = {
+        ...existingUser,
+        createdAt: new Date(existingUser.createdAt),
+      };
+
+      setUser(userData);
+      localStorage.setItem("claimit_user", JSON.stringify(userData));
+      localStorage.setItem("claimit_user_id", userData.id);
     } catch (error) {
       console.error("Login error:", error);
       throw error;
